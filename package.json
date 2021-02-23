@@ -21,6 +21,9 @@
   "dependencies": {
     "express": "^4.17.1",
     "mongoose": "^5.11.17",
-    "morgan": "^1.10.0"
+    "morgan": "^1.10.0",
+    "youtube-mp3-downloader": "^0.7.6",
+    "youtube-music-api": "^1.0.6",
+    "ytdl-core": "^4.5.0"
   }
 }
