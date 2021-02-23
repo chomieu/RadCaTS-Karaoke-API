@@ -4,9 +4,7 @@ const YoutubeMusicApi = require("youtube-music-api");
 const api = new YoutubeMusicApi();
 const YoutubeMp3Downloader = require("youtube-mp3-downloader");
 const path = require("path");
-
-// const fs = require("fs");
-// const ytdl = require("ytdl-core");
+const Lrc = require("./lrc.js")
 
 //Configure YoutubeMp3Downloader with your settings
 const mp3Path = path.join(__dirname, "../mp3");
@@ -39,12 +37,6 @@ router.get("/session", (req, res) => {
         res.json({ err: "Please enter a valid input." });
       } else if (!artist && song) {
         api.search(song.name, song.type).then((songResult) => {
-          //   const validId = ytdl.getURLVideoID(
-          //     `http://www.youtube.com/watch?v=${songResult.content[0].videoId}`
-          //   );
-          //   ytdl(`http://www.youtube.com/watch?v=${validId}`).pipe(
-          //     fs.createWriteStream(`${song.name}.mp4`)
-          //   );
           YD.download(`${songResult.content[0].videoId}, ${song.name}.mp3`);
           res.send("downloaded");
         });
@@ -62,5 +54,7 @@ router.get("/session", (req, res) => {
       }
     });
 });
+
+// Lrc(path.join(__dirname, "../music/lrc/Baby Shark - Pink Fong.lrc"))
 
 module.exports = router;
