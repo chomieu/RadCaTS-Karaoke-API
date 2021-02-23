@@ -23,7 +23,6 @@
     "mongoose": "^5.11.17",
     "morgan": "^1.10.0",
     "youtube-audio-server": "^2.4.2",
-    "youtube-audio-stream": "^0.3.6",
     "youtube-music-api": "^1.0.6"
   }
 }
