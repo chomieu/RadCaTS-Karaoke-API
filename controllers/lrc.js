@@ -1,12 +1,19 @@
-const LRC = require("lrc.js")
-const fs = require("fs")
+const LRC = require("lrc.js");
+const fs = require("fs");
+const path = require("path");
 
-const Lrc = (filePath) => {
+const lrcParser = (filePath) => {
   fs.readFile(filePath, (err, data) => {
-    let lyrics = LRC.parse(data.toString())
-    console.log(lyrics.toJSON())
-    return lyrics.toJSON()
-  })
-}
+    let lyrics = LRC.parse(data.toString());
+    return lyrics.toJSON();
+  });
+};
 
-module.exports = Lrc;
+const createLrc = (songName, artistName) => {
+  const fileName = `${songName} - ${artistName}.lrc`;
+  const lrcPath = path.join(__dirname, `../music/lrc/${fileName}`);
+  const input = `[ti:${songName}][ar:${artistName}]`;
+  fs.writeFile(lrcPath, input, (err) => console.log(err));
+};
+
+module.exports = { lrcParser, createLrc };

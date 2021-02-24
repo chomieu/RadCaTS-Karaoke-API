@@ -2,20 +2,10 @@ const router = require("express").Router();
 const db = require("../models");
 const YoutubeMusicApi = require("youtube-music-api");
 const api = new YoutubeMusicApi();
-const YoutubeMp3Downloader = require("youtube-mp3-downloader");
 const path = require("path");
-const Lrc = require("./lrc.js")
-
-//Configure YoutubeMp3Downloader with your settings
-const mp3Path = path.join(__dirname, "../mp3");
-const YD = new YoutubeMp3Downloader({
-  ffmpegPath: "/usr/local/opt/ffmpeg/bin/ffmpeg", // FFmpeg binary location
-  outputPath: mp3Path, // Output file location (default: the home directory)
-  youtubeVideoQuality: "highestaudio", // Desired video quality (default: highestaudio)
-  queueParallelism: 2, // Download parallelism (default: 1)
-  progressTimeout: 2000, // Interval in ms for the progress reports (default: 1000)
-  allowWebm: false, // Enable download from WebM sources (default: false)
-});
+const Mp3 = require("./mp3");
+const { lrcParser, createLrc } = require("./lrc.js");
+const fs = require("fs");
 
 router.get("/", (req, res) => {
   db.User.findOne(req.body)
@@ -37,7 +27,16 @@ router.get("/session", (req, res) => {
         res.json({ err: "Please enter a valid input." });
       } else if (!artist && song) {
         api.search(song.name, song.type).then((songResult) => {
-          YD.download(`${songResult.content[0].videoId}, ${song.name}.mp3`);
+          console.log(songResult);
+          const songName = songResult.content[0].name.toLowerCase();
+          const artistName = songResult.content[0].artist.name.toLowerCase();
+          fs.readdir(path.join(__dirname, "../music/mp3"), (err, data) => {
+            console.log(data);
+            if (data.indexOf(`${songName} - ${artistName}.mp3`) === -1) {
+              createLrc(songName, artistName);
+              Mp3(songResult.content[0].videoId, songName, artistName);
+            }
+          });
           res.send("downloaded");
         });
       } else if (artist.name && !song.name) {
@@ -55,6 +54,6 @@ router.get("/session", (req, res) => {
     });
 });
 
-// Lrc(path.join(__dirname, "../music/lrc/Baby Shark - Pink Fong.lrc"))
+// lrcParser(path.join(__dirname, "../music/lrc/Baby Shark - Pink Fong.lrc"))
 
 module.exports = router;
