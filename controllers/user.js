@@ -1,24 +1,110 @@
 const router = require("express").Router();
 const db = require("../models");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const authenticateMe = (req) => {
+  let token = false;
+
+  if (!req.headers) {
+    token = false;
+  } else if (!req.headers.authorization) {
+    token = false;
+  } else {
+    token = req.headers.authorization.split(" ")[1];
+  }
+  let data = false;
+  if (token) {
+    data = jwt.verify(token, "privatekey", (err, data) => {
+      if (err) {
+        return false;
+      } else {
+        return data;
+      }
+    });
+  }
+  return data;
+};
 
 router.post("/api/signup", (req, res) => {
   db.User.create(req.body)
-    .then(() => {
-      res.redirect("/login");
+    .then((newUser) => {
+      newUser.save((err) => {
+        throw err;
+      });
+      const token = jwt.sign(
+        {
+          username: newUser.username,
+          id: newUser._id,
+        },
+        "privatekey",
+        {
+          expiresIn: "2h",
+        }
+      );
+      return res.json({ user: newUser, token });
+      // res.redirect("/login");
+    })
+    .catch((err) => {
+      res.status(500).json(err);
+    });
+});
+
+router.post("/api/login", (req, res) => {
+  db.User.findOne({
+    where: {
+      username: req.body.username,
+    },
+  })
+    .then((user) => {
+      // if (user && bcrypt.compareSync(req.body.password, user.password)) {
+      //   const token = jwt.sign(
+      //     {
+      //       email: user.email,
+      //       id: user.id,
+      //     },
+      //     "privatekey",
+      //     {
+      //       expiresIn: "2h",
+      //     }
+      //   );
+      //   return res.json({ user, token });
+      // } else {
+      //   res.json({ err: "You have entered an invalid username or password!" });
+      // }
+      console.log(user);
+      if (!user) {
+        return res.status(404).send("no such user");
+      } else if (bcrypt.compareSync(req.body.password, user.password)) {
+        const token = jwt.sign(
+          {
+            email: user.email,
+            id: user.id,
+            name: user.name,
+          },
+          "catscatscats",
+          {
+            expiresIn: "2h",
+          }
+        );
+        return res.json({ user, token });
+      } else {
+        return res.status(403).send("wrong password");
+      }
+      // res.redirect("/");
     })
     .catch((err) => {
       res.json(err);
     });
 });
 
-router.post("/api/login", (req, res) => {
-  db.User.findOne(req.body)
-    .then(() => {
-      res.redirect("/");
-    })
-    .catch(() => {
-      res.json({ err: "You have entered an invalid username or password!" });
-    });
+router.get("/", (req, res) => {
+  let tokenData = authenticateMe(req);
+  if (tokenData) {
+    res.json(tokenData);
+  } else {
+    res.status(403).send("auth failed");
+  }
 });
 
 module.exports = router;
