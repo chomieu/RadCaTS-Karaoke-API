@@ -42,7 +42,6 @@ router.post("/api/signup", (req, res) => {
         }
       );
       return res.json({ user: newUser, token });
-      // res.redirect("/login");
     })
     .catch((err) => {
       res.status(500).json(err);
