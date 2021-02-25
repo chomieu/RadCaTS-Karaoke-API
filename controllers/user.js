@@ -2,6 +2,7 @@ const router = require("express").Router();
 const db = require("../models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const authenticateMe = (req) => {
   let token = false;
@@ -15,7 +16,7 @@ const authenticateMe = (req) => {
   }
   let data = false;
   if (token) {
-    data = jwt.verify(token, "privatekey", (err, data) => {
+    data = jwt.verify(token, process.env.PRIVATEKEY, (err, data) => {
       if (err) {
         return false;
       } else {
@@ -29,21 +30,17 @@ const authenticateMe = (req) => {
 router.post("/api/signup", (req, res) => {
   db.User.create(req.body)
     .then((newUser) => {
-      newUser.save((err) => {
-        throw err;
-      });
       const token = jwt.sign(
         {
           username: newUser.username,
           id: newUser._id,
         },
-        "privatekey",
+        process.env.PRIVATEKEY,
         {
           expiresIn: "2h",
         }
       );
       return res.json({ user: newUser, token });
-      // res.redirect("/login");
     })
     .catch((err) => {
       res.status(500).json(err);
@@ -51,47 +48,23 @@ router.post("/api/signup", (req, res) => {
 });
 
 router.post("/api/login", (req, res) => {
-  db.User.findOne({
-    where: {
-      username: req.body.username,
-    },
-  })
+  db.User.findOne({ username: req.body.username })
     .then((user) => {
-      // if (user && bcrypt.compareSync(req.body.password, user.password)) {
-      //   const token = jwt.sign(
-      //     {
-      //       email: user.email,
-      //       id: user.id,
-      //     },
-      //     "privatekey",
-      //     {
-      //       expiresIn: "2h",
-      //     }
-      //   );
-      //   return res.json({ user, token });
-      // } else {
-      //   res.json({ err: "You have entered an invalid username or password!" });
-      // }
-      console.log(user);
-      if (!user) {
-        return res.status(404).send("no such user");
-      } else if (bcrypt.compareSync(req.body.password, user.password)) {
+      if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign(
           {
-            email: user.email,
-            id: user.id,
-            name: user.name,
+            username: user.username,
+            id: user._id,
           },
-          "catscatscats",
+          process.env.PRIVATEKEY,
           {
             expiresIn: "2h",
           }
         );
         return res.json({ user, token });
       } else {
-        return res.status(403).send("wrong password");
+        res.json({ err: "You have entered an invalid username or password!" });
       }
-      // res.redirect("/");
     })
     .catch((err) => {
       res.json(err);
@@ -101,7 +74,14 @@ router.post("/api/login", (req, res) => {
 router.get("/", (req, res) => {
   let tokenData = authenticateMe(req);
   if (tokenData) {
-    res.json(tokenData);
+    db.User.findOne({ _id: tokenData.id })
+      .populate("records")
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => {
+        res.json(err);
+      });
   } else {
     res.status(403).send("auth failed");
   }
