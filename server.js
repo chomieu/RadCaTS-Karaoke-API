@@ -3,6 +3,7 @@ const express = require("express");
 const logger = require("morgan");
 const app = express();
 const cors = require("cors");
+
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
