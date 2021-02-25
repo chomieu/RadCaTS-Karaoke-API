@@ -30,9 +30,7 @@ const authenticateMe = (req) => {
 router.post("/api/signup", (req, res) => {
   db.User.create(req.body)
     .then((newUser) => {
-      newUser.save((err) => {
-        throw err;
-      });
+      console.log("THIS IS NEW USER", newUser);
       const token = jwt.sign(
         {
           username: newUser.username,
