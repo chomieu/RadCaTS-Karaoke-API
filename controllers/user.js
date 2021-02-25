@@ -30,6 +30,7 @@ const authenticateMe = (req) => {
 router.post("/api/signup", (req, res) => {
   db.User.create(req.body)
     .then((newUser) => {
+      console.log("THIS IS NEW USER", newUser);
       const token = jwt.sign(
         {
           username: newUser.username,
@@ -48,13 +49,17 @@ router.post("/api/signup", (req, res) => {
 });
 
 router.post("/api/login", (req, res) => {
-  db.User.findOne({ username: req.body.username })
+  db.User.findOne({
+    where: {
+      username: req.body.username,
+    },
+  })
     .then((user) => {
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign(
           {
-            username: user.username,
-            id: user._id,
+            email: user.email,
+            id: user.id,
           },
           process.env.PRIVATEKEY,
           {
@@ -74,14 +79,7 @@ router.post("/api/login", (req, res) => {
 router.get("/", (req, res) => {
   let tokenData = authenticateMe(req);
   if (tokenData) {
-    db.User.findOne({ _id: tokenData.id })
-      .populate("records")
-      .then((data) => {
-        res.json(data);
-      })
-      .catch((err) => {
-        res.json(err);
-      });
+    res.json(tokenData);
   } else {
     res.status(403).send("auth failed");
   }
