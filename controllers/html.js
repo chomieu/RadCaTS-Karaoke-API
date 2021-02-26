@@ -18,9 +18,9 @@ router.get("/", (req, res) => {
 router.get("/api/song", (req, res) => {
   db.Song.find({}).sort([['name', 1]])
     .then(data => {
-      let songObj = {}
-      let songArr = data.map(song => { songObj.id = song._id, songObj.name = `${song.name} - ${song.artist}` })
-      res.json(songArr)
+      const songObj = {}
+      data.map(song => { songObj[`"${song.name} - ${song.artist}"`] = null })
+      res.json(songObj)
     })
     .catch(err => {
       if (err) throw err
