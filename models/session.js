@@ -10,10 +10,14 @@ const SessionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "User"
   }],
-  records: [{
+  karaokeSong: {
     type: Schema.Types.ObjectId,
     ref: "Song"
-  }]
+  },
+  scores: {
+    type: Array,
+    default: []
+  }
 });
 
 const Session = mongoose.model("Session", SessionSchema)
