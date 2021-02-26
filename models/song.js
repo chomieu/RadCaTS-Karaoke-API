@@ -10,21 +10,16 @@ const SongSchema = new Schema({
     type: String,
     required: true
   },
-  genre: {
-    type: String,
-    required: true
-  },
   lyrics: {
-    type: String,
-    required: true
-  },
-  instrumental: {
     type: String,
     required: true
   },
   mixed: {
     type: String,
     required: true
+  },
+  instrumental: {
+    type: String
   }
 });
 
