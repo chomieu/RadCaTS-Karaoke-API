@@ -5,7 +5,6 @@ const db = require("../models");
 // Req.body format we need from frontend = 
 // {
 //    host: user_id,
-//    members: user_id,
 //    karaokeSong: song_id (comes from the search through /api/song route)
 // }
 // Returns the new session's id
@@ -18,7 +17,6 @@ router.post("/api/session", (req, res) => {
       if (err) throw err
     })
 })
-
 
 // Finds created session by id
 // Returns all of karaoke song's data and files
@@ -34,6 +32,7 @@ router.get("/api/session/:id", (req, res) => {
     })
 })
 
+// At the end of each karaoke session
 // Req.body we need from frontend =
 // {
 //    token: "token",

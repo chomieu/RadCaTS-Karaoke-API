@@ -75,7 +75,7 @@ router.post("/api/login", (req, res) => {
 router.get("/", (req, res) => {
   let tokenData = authenticateMe(req);
   if (tokenData) {
-    db.User.findOne({ _id: tokenData.id })
+    db.User.findOne({ _id: tokenData.id }).populate("records")
       .then((user) => {
         let token = req.headers.authorization.split(" ")[1];
         res.json({ user, token });
