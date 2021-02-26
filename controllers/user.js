@@ -6,14 +6,21 @@ require("dotenv").config();
 
 const authenticateMe = (req) => {
   let token = false;
-  if (!req.headers) { token = false; }
-  else if (!req.headers.authorization) { token = false; }
-  else { token = req.headers.authorization.split(" ")[1] }
+  if (!req.headers) {
+    token = false;
+  } else if (!req.headers.authorization) {
+    token = false;
+  } else {
+    token = req.headers.authorization.split(" ")[1];
+  }
   let data = false;
   if (token) {
     data = jwt.verify(token, process.env.PRIVATEKEY, (err, data) => {
-      if (err) { return false; }
-      else { return data; }
+      if (err) {
+        return false;
+      } else {
+        return data;
+      }
     });
   }
   return data;
@@ -54,9 +61,7 @@ router.post("/api/login", (req, res) => {
             expiresIn: "2h",
           }
         );
-        return (res.json({ user, token }))
-
-
+        return res.json({ user, token });
       } else {
         res.json({ err: "You have entered an invalid username or password!" });
       }
@@ -66,18 +71,18 @@ router.post("/api/login", (req, res) => {
     });
 });
 
+// Autenticate user login information and populates homepage with user data
 router.get("/", (req, res) => {
-
   let tokenData = authenticateMe(req);
   if (tokenData) {
     db.User.findOne({ _id: tokenData.id })
-      .then(user => {
-        let token = req.headers.authorization.split(" ")[1]
-        res.json({ user, token })
+      .then((user) => {
+        let token = req.headers.authorization.split(" ")[1];
+        res.json({ user, token });
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).json(err);
-      })
+      });
   } else {
     res.status(403).send("auth failed");
   }
