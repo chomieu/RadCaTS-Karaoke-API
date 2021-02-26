@@ -49,11 +49,7 @@ router.post("/api/signup", (req, res) => {
 });
 
 router.post("/api/login", (req, res) => {
-  db.User.findOne({
-    where: {
-      username: req.body.username,
-    },
-  })
+  db.User.findOne({username: req.body.username})
     .then((user) => {
       if (user && bcrypt.compareSync(req.body.password, user.password)) {
         const token = jwt.sign(

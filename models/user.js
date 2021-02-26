@@ -20,7 +20,7 @@ const UserSchema = new Schema({
   records: [
     {
       type: Schema.Types.ObjectId,
-      ref: "Song",
+      ref: "Session",
     },
   ],
 });
