@@ -1,5 +1,9 @@
 const router = require("express").Router();
 const db = require("../models");
+const LRC = require("lrc.js");
+const { lrcParser } = require("./lrc.js");
+const fs = require("fs");
+const path = require("path");
 
 // Creates a new karaoke session
 // Req.body format we need from frontend = 
@@ -23,8 +27,14 @@ router.post("/api/session", (req, res) => {
 router.get("/api/session/:id", (req, res) => {
   db.Session.findOne({ _id: req.params.id }).populate("karaokeSong")
     .then(sessionData => {
-      db.Song.findOne({ _id: sessionData.karaokeSong }).then(songData => {
-        res.json(songData)
+      db.Song.findOne({ _id: sessionData.karaokeSong._id }).then(songData => {
+        fs.readFile(path.join(__dirname, `../lrc/${songData.lyrics}`), async (err, data) => {
+          let parsed = await LRC.parse(data.toString());
+          const lyrics = JSON.stringify(parsed)
+          console.log("songData", songData)
+          songData.lyrics = lyrics
+          res.json(songData)
+        });
       })
     })
     .catch(err => {
@@ -38,28 +48,28 @@ router.get("/api/session/:id", (req, res) => {
 //    token: "token",
 //    score: number
 // }
-router.put("/api/session/:id", (req, res) => {
-  // 1. Finds user via token and add the karaoke session to their records
-  const id = decryptToken(req.body.token)
-  db.User.findOneAndUpdate({ _id: id }, { $addToSet: { records: [req.params.id] } })
-    .then(() => {
-      res.send("Session added to user's records!")
-    })
-  // 2. Updates Session.members with the user's id and Session.scores with the user's score
-  db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [id], scores: [{ id: req.body.score }] } })
-    .then(() => {
-      res.send("New member added!")
-    })
-    .catch(err => {
-      if (err) throw err
-    })
-})
+// router.put("/api/session/:id", (req, res) => {
+//   // 1. Finds user via token and add the karaoke session to their records
+//   // const id = decryptToken(req.body.token)
+//   db.User.findOneAndUpdate({ _id: id }, { $addToSet: { records: [req.params.id] } })
+//     .then(() => {
+//       res.send("Session added to user's records!")
+//     })
+//   // 2. Updates Session.members with the user's id and Session.scores with the user's score
+//   db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [id], scores: [{ id: req.body.score }] } })
+//     .then(() => {
+//       res.send("New member added!")
+//     })
+//     .catch(err => {
+//       if (err) throw err
+//     })
+// })
 
-// Decrypt the token to find the right user's id
-function decryptToken(token) {
-  const userId
-  // Decrypt here
-  return userId
-}
+// // Decrypt the token to find the right user's id
+// function decryptToken(token) {
+//   const userId
+//   // Decrypt here
+//   return userId
+// }
 
 module.exports = router;

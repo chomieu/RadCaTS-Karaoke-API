@@ -29,6 +29,10 @@ app.use(htmlRoutes);
 const mp3Routes = require("./controllers/mp3");
 app.use(mp3Routes);
 
+// Session Routes
+const sessionRoutes = require("./controllers/session");
+app.use(sessionRoutes);
+
 // Server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
