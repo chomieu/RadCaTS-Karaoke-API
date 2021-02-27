@@ -3,9 +3,9 @@ const fs = require("fs");
 const path = require("path");
 
 const lrcParser = (filePath) => {
-  fs.readFile(filePath, (err, data) => {
+  fs.readFile(filePath, async (err, data) => {
     let lyrics = LRC.parse(data.toString());
-    return lyrics.toJSON();
+    return await lyrics;
   });
 };
 
