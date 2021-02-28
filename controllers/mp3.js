@@ -18,7 +18,7 @@ router.post("/api/download", (req, res) => {
 
           const songName = songResult.content[0].name.toLowerCase();
           const artistName = songResult.content[0].artist.name.toLowerCase();
-          
+
           fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
             if (data.indexOf(`${songName} - ${artistName}.lrc`) === -1) {
               createLrc(songName, artistName);
@@ -37,6 +37,7 @@ router.post("/api/download", (req, res) => {
               axios
                 .request(options)
                 .then(function (response) {
+                  console.log(data)
                   const mp3Url = response.data.Download_url;
                   db.Song.create({
                     name: songName,
@@ -45,10 +46,14 @@ router.post("/api/download", (req, res) => {
                     mixed: mp3Url,
                   }).then(() => {
                     res.send("downloaded");
-                  });
+                  })
+                    // added-sjf
+                    .catch(err => { res.status(500).send(err) })
                 })
                 .catch(function (error) {
-                  console.error(error);
+                  console.error(error)
+                  // added-sjf
+                  res.status(500).send(err)
                 });
 
             } else {
@@ -57,7 +62,9 @@ router.post("/api/download", (req, res) => {
           });
         });
       }
-    });
+    })
+    // added-sjf
+    .catch(err => { res.status(500).send(err) })
 });
 
 module.exports = router;
