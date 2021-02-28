@@ -23,21 +23,23 @@ router.post("/api/download", (req, res) => {
 
           fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
 
+            const duplicateLrcErrorMessage = {
+              title: songName,
+              artist: artistName,
+              errorMessage: 'this song already existed!'
+            }
+
             if (data.indexOf(`${songName} - ${artistName}.lrc`) === -1) {
-              console.log(27, songName)
-              console.log(28, artistName)
 
               // bug: user search "let it go original"
               // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
               // the '/' causes an issue for createLrc() filepath
               // split on the unwanted characters and join with single space to remove unwanted characters
-              let test = songName
-              test = test.split('/').join(' ')
-              console.log(36, test)
+              let safeName = songName
+              safeName = safeName.split('/').join(' ')
+              duplicateLrcErrorMessage.title = safeName
 
-
-              createLrc(test, artistName);
-
+              createLrc(safeName, artistName);
               const options = {
                 method: "GET",
                 url: "https://youtube-to-mp32.p.rapidapi.com/yt_to_mp3",
@@ -52,7 +54,7 @@ router.post("/api/download", (req, res) => {
               axios
                 .request(options)
                 .then(function (response) {
-                  console.log(55, response.data)// see below
+                  console.log(53, response.data)// see below
                   // 55 {
                   //   Status: 'Fail',
                   //   Status_Code: 103,
@@ -64,8 +66,8 @@ router.post("/api/download", (req, res) => {
                     db.Song.create({
                       name: songName,
                       artist: artistName,
-                      lyrics: `${songName} - ${artistName}.lrc`,
-
+                      // added-sjf updated to match lrc file name 
+                      lyrics: `${test} - ${artistName}.lrc`,
                       mixed: mp3Url,
                     }).then(() => {
                       res.send("downloaded");
@@ -76,7 +78,10 @@ router.post("/api/download", (req, res) => {
                         res.status(500).send(err)
                       })
                   } else {
-                    res.status(404).send(response.data) // see example on line 55
+                    //if song can not be downloaded, respond with custom message
+                    duplicateLrcErrorMessage.errorMessage = 'song is not available for karaoke yet'
+
+                    res.send(duplicateLrcErrorMessage)
                   }
                 })
                 .catch(function (error) {
@@ -85,7 +90,7 @@ router.post("/api/download", (req, res) => {
                   res.status(500).send(err)
                 });
             } else {
-              res.send("this song already existed!");
+              res.send(duplicateLrcErrorMessage);
             }
           });
         });
