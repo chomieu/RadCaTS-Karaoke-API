@@ -5,7 +5,9 @@ const YoutubeMusicApi = require("youtube-music-api");
 const musicApi = new YoutubeMusicApi();
 const { createLrc } = require("./lrc.js");
 const fs = require("fs");
-const path = require("path");
+const path = require("path")
+
+
 
 router.post("/api/download", (req, res) => {
   musicApi
@@ -35,6 +37,8 @@ router.post("/api/download", (req, res) => {
               // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
               // the '/' causes an issue for createLrc() filepath
               // split on the unwanted characters and join with single space to remove unwanted characters
+
+
               let safeName = songName
               safeName = safeName.split('/').join(' ')
               duplicateLrcErrorMessage.title = safeName
@@ -67,7 +71,7 @@ router.post("/api/download", (req, res) => {
                       name: songName,
                       artist: artistName,
                       // added-sjf updated to match lrc file name 
-                      lyrics: `${test} - ${artistName}.lrc`,
+                      lyrics: `${safeName} - ${artistName}.lrc`,
                       mixed: mp3Url,
                     }).then(() => {
                       res.send("downloaded");
@@ -80,7 +84,6 @@ router.post("/api/download", (req, res) => {
                   } else {
                     //if song can not be downloaded, respond with custom message
                     duplicateLrcErrorMessage.errorMessage = 'song is not available for karaoke yet'
-
                     res.send(duplicateLrcErrorMessage)
                   }
                 })
