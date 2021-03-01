@@ -50,7 +50,7 @@ router.get("/api/session/:id", (req, res) => {
 // }
 // router.put("/api/session/:id", (req, res) => {
 //   // 1. Finds user via token and add the karaoke session to their records
-//   // const id = decryptToken(req.body.token)
+//   const id = decryptToken(req.body.token)
 //   db.User.findOneAndUpdate({ _id: id }, { $addToSet: { records: [req.params.id] } })
 //     .then(() => {
 //       res.send("Session added to user's records!")
