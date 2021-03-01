@@ -7,7 +7,12 @@ const { createLrc } = require("./lrc.js");
 const fs = require("fs");
 const path = require("path")
 
-
+// Deletes all stored songs
+router.delete("/api/song/deleteAll", (req, res) => {
+  db.Song.remove().then(() => {
+    res.send("All songs deleted!")
+  })
+})
 
 router.post("/api/download", (req, res) => {
   musicApi
@@ -16,7 +21,7 @@ router.post("/api/download", (req, res) => {
       if (!req.body.name) {
         res.json({ err: "Please enter a valid input." });
       } else {
-        musicApi.search(req.body.name, "song").then((songResult) => {
+        musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
 
           console.log(19, songResult.content[0])
 
@@ -64,15 +69,18 @@ router.post("/api/download", (req, res) => {
                   //   Status_Code: 103,
                   //   Warining: 'Video Id Maybe Invalid Or Retry Again May Work'
                   // }
-                  const mp3Url = response.data.Download_url;
+                  const tinyUrl = response.data.Download_url;
                   // added-sjf conditional to check if mp3Url exists to avoid db.Song.create failure.
-                  if (mp3Url) {
+
+                  const CloudinaryUrl = ""
+
+                  if (CloudinaryUrl) {
                     db.Song.create({
                       name: songName,
                       artist: artistName,
                       // added-sjf updated to match lrc file name 
                       lyrics: `${safeName} - ${artistName}.lrc`,
-                      mixed: mp3Url,
+                      mixed: CloudinaryUrl,
                     }).then(() => {
                       res.send("downloaded");
                     })
