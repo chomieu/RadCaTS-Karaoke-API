@@ -23,7 +23,7 @@ router.post("/api/download", (req, res) => {
       } else {
         musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
 
-          console.log(19, songResult.content[0])
+          console.log(26, songResult.content[0])
 
           const songName = songResult.content[0].name.toLowerCase();
           const artistName = songResult.content[0].artist.name.toLowerCase();
@@ -63,7 +63,7 @@ router.post("/api/download", (req, res) => {
               axios
                 .request(options)
                 .then(function (response) {
-                  console.log(53, response.data)// see below
+                  console.log(66, response.data)// see below
                   // 55 {
                   //   Status: 'Fail',
                   //   Status_Code: 103,
@@ -74,13 +74,15 @@ router.post("/api/download", (req, res) => {
 
                   const CloudinaryUrl = ""
 
-                  if (CloudinaryUrl) {
+                  // if (CloudinaryUrl) {
+                  if (tinyUrl) {
                     db.Song.create({
                       name: songName,
                       artist: artistName,
                       // added-sjf updated to match lrc file name 
                       lyrics: `${safeName} - ${artistName}.lrc`,
-                      mixed: CloudinaryUrl,
+                      // mixed: CloudinaryUrl,
+                      mixed: tinyUrl,
                     }).then(() => {
                       res.send("downloaded");
                     })
