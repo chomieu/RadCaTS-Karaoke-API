@@ -10,6 +10,14 @@ const musicApi = new YoutubeMusicApi();
 const youtubedl = require('youtube-dl');
 const ffmpeg = require('ffmpeg');
 
+// Deletes all stored songs
+router.delete("/api/song/deleteAll", (req, res) => {
+  db.Song.remove().then(() => {
+    res.send("All songs deleted!")
+  })
+})
+
+//Download song
 router.post("/api/download", (req, res) => {
   musicApi
     .initalize() // Retrieves Innertube Config
@@ -17,7 +25,9 @@ router.post("/api/download", (req, res) => {
       if (!req.body.name) {
         res.json({ err: "Please enter a valid input." });
       } else {
-        musicApi.search(req.body.name, "song").then((songResult) => {
+        musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
+
+          console.log(19, songResult.content[0])
 
           const songName = songResult.content[0].name.toLowerCase();
           const safeName = songName.split('/').join(' ');
