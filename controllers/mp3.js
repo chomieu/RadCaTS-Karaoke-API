@@ -36,7 +36,7 @@ router.post("/api/download", (req, res) => {
               errorMessage: 'this song already existed!'
             }
 
-            if (data.indexOf(`${songName} - ${artistName}.lrc`) === -1) {
+            if (data.indexOf(`${songName} - ${artistName}.lrc`) !== -1) {
 
               // bug: user search "let it go original"
               // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
@@ -48,7 +48,7 @@ router.post("/api/download", (req, res) => {
               safeName = safeName.split('/').join(' ')
               duplicateLrcErrorMessage.title = safeName
 
-              createLrc(safeName, artistName);
+              // createLrc(safeName, artistName);
               const options = {
                 method: "GET",
                 url: "https://youtube-to-mp32.p.rapidapi.com/yt_to_mp3",
