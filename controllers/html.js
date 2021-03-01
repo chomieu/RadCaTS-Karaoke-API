@@ -7,11 +7,7 @@ router.get("/api/song", (req, res) => {
   db.Song.find({})
     .sort([["name", 1]])
     .then((data) => {
-      const songObj = {};
-      data.map((song) => {
-        songObj[`"${song.name} - ${song.artist}"`] = null;
-      });
-      res.json(songObj);
+      res.json(data);
     })
     .catch((err) => {
       if (err) throw err;
