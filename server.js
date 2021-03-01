@@ -4,6 +4,37 @@ const logger = require("morgan");
 const app = express();
 const cors = require("cors");
 
+// Socket.io stuff
+const path = require("path")
+const http = require("http")
+const socketio = require("socket.io")
+const server = http.createServer(app)
+const io = socketio(server)
+app.use(express.static(path.join(__dirname, "public")))
+// Run when client connects
+io.on("connection", socket => {
+  console.log("new WS connection")
+  socket.emit("message", "welcome to chat") // to a single client when they join
+  // Broadcase when a user connects
+  socket.broadcast.emit("message", "user has joins the chat") // to all but the client
+  
+  socket.on("disconnect", ()=> {
+    io.emit("message", "user has left the chat") // to everyone in general
+  })
+
+  socket.on("chatMessage", (msg) => {
+    io.emit("message", msg)
+  })
+
+  socket.on("audioSrc", (source) => {
+    io.emit("message", source)
+    var audio = document.createElement("audio")
+    audio.src = source
+    audio.play()
+  })
+})
+
+
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -34,7 +65,7 @@ const sessionRoutes = require("./controllers/session");
 app.use(sessionRoutes);
 
 // Server
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+const PORT = process.env.PORT || 7000;
+server.listen(PORT, () => { // Changed from app.listen to server.listen for socket.io
   console.log(`http://localhost:${PORT}`);
 });
