@@ -1,8 +1,7 @@
 const router = require("express").Router();
 const db = require("../models");
 const { createLrc } = require("./lrc.js");
-const cloudinary = require("./cloudinary")
-const axios = require("axios").default;
+const cloudinary = require("./cloudinary");
 const fs = require("fs");
 const path = require("path");
 const YoutubeMusicApi = require("youtube-music-api");
@@ -26,8 +25,6 @@ router.post("/api/download", (req, res) => {
         res.json({ err: "Please enter a valid input." });
       } else {
         musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
-
-          console.log(19, songResult.content[0])
 
           const songName = songResult.content[0].name.toLowerCase();
           const safeName = songName.split('/').join(' ');
@@ -90,7 +87,6 @@ router.post("/api/download", (req, res) => {
                           })
                             // added-sjf
                             .catch(err => {
-                              console.log(67)
                               res.status(500).send(err)
                             })
                         } else {
@@ -117,7 +113,6 @@ router.post("/api/download", (req, res) => {
     })
     // added-sjf
     .catch(err => {
-      console.log(84)
       res.status(500).send(err)
     })
 });
