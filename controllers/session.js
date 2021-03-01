@@ -5,6 +5,13 @@ const { lrcParser } = require("./lrc.js");
 const fs = require("fs");
 const path = require("path");
 
+// Deletes all stored sessions
+router.delete("/api/session/deleteAll", (req, res) => {
+  db.Session.remove().then(() => {
+    res.send("All sessions deleted!")
+  })
+})
+
 // Creates a new karaoke session
 // Req.body format we need from frontend = 
 // {
