@@ -1,11 +1,14 @@
 const router = require("express").Router();
 const db = require("../models");
+const { createLrc } = require("./lrc.js");
+const cloudinary = require("./cloudinary")
 const axios = require("axios").default;
+const fs = require("fs");
+const path = require("path");
 const YoutubeMusicApi = require("youtube-music-api");
 const musicApi = new YoutubeMusicApi();
-const { createLrc } = require("./lrc.js");
-const fs = require("fs");
-const path = require("path")
+const youtubedl = require('youtube-dl');
+const ffmpeg = require('ffmpeg');
 
 // Deletes all stored songs
 router.delete("/api/song/deleteAll", (req, res) => {
@@ -14,6 +17,7 @@ router.delete("/api/song/deleteAll", (req, res) => {
   })
 })
 
+//Download song
 router.post("/api/download", (req, res) => {
   musicApi
     .initalize() // Retrieves Innertube Config
@@ -26,7 +30,9 @@ router.post("/api/download", (req, res) => {
           console.log(19, songResult.content[0])
 
           const songName = songResult.content[0].name.toLowerCase();
+          const safeName = songName.split('/').join(' ');
           const artistName = songResult.content[0].artist.name.toLowerCase();
+          const fileName = safeName + " - " + artistName;
 
           fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
 
@@ -43,63 +49,65 @@ router.post("/api/download", (req, res) => {
               // the '/' causes an issue for createLrc() filepath
               // split on the unwanted characters and join with single space to remove unwanted characters
 
-
-              let safeName = songName
-              safeName = safeName.split('/').join(' ')
-              duplicateLrcErrorMessage.title = safeName
+              duplicateLrcErrorMessage.title = safeName;
 
               createLrc(safeName, artistName);
-              const options = {
-                method: "GET",
-                url: "https://youtube-to-mp32.p.rapidapi.com/yt_to_mp3",
-                params: { video_id: songResult.content[0].videoId },
-                headers: {
-                  "x-rapidapi-key":
-                    "5d41389558mshc739796a61beb69p102c43jsn1612f6aaee40",
-                  "x-rapidapi-host": "youtube-to-mp32.p.rapidapi.com",
-                },
-              };
 
-              axios
-                .request(options)
-                .then(function (response) {
-                  console.log(53, response.data)// see below
-                  // 55 {
-                  //   Status: 'Fail',
-                  //   Status_Code: 103,
-                  //   Warining: 'Video Id Maybe Invalid Or Retry Again May Work'
-                  // }
-                  const tinyUrl = response.data.Download_url;
-                  // added-sjf conditional to check if mp3Url exists to avoid db.Song.create failure.
+              //get mp4
+              const video = youtubedl(`http://www.youtube.com/watch?v=${songResult.content[0].videoId}`,
+                // Optional arguments passed to youtube-dl.
+                ['--format=18'],
+              )
 
-                  const CloudinaryUrl = ""
+              // write mp4
+              const mp4FilePath = path.join(__dirname, `../music/mp4/test.mp4`);
+              const mp4 = video.pipe(fs.createWriteStream(mp4FilePath));
 
-                  if (CloudinaryUrl) {
-                    db.Song.create({
-                      name: songName,
-                      artist: artistName,
-                      // added-sjf updated to match lrc file name 
-                      lyrics: `${safeName} - ${artistName}.lrc`,
-                      mixed: CloudinaryUrl,
-                    }).then(() => {
-                      res.send("downloaded");
-                    })
-                      // added-sjf
-                      .catch(err => {
-                        console.log(67)
-                        res.status(500).send(err)
-                      })
-                  } else {
-                    //if song can not be downloaded, respond with custom message
-                    duplicateLrcErrorMessage.errorMessage = 'song is not available for karaoke yet'
-                    res.send(duplicateLrcErrorMessage)
-                  }
-                })
-                .catch(function (error) {
-                  console.error(error)
-                  // added-sjf
-                  res.status(500).send(err)
-                });
+              mp4.on('close', () => {
+                try {
+                  const process = new ffmpeg(path.join(__dirname, `../music/mp4/test.mp4`));
+                  process.then((video) => {
+
+                    //extract mp3 from mp4
+                    video.fnExtractSoundToMP3(path.join(__dirname, `../music/mp3/test.mp3`), (error, file) => {
+                      cloudinary.uploader.upload(file, {
+                        resource_type: "video",
+                        public_id: fileName,
+                        folder: 'mp3',
+                        use_filename: true,
+                        chunk_size: 6000000,
+                      }, (error, result) => {
+                        const mp3Url = result.url;
+                        if (mp3Url) {
+                          db.Song.create({
+                            name: songName,
+                            artist: artistName,
+                            // added-sjf updated to match lrc file name 
+                            lyrics: `${safeName} - ${artistName}.lrc`,
+                            mixed: mp3Url,
+                          }).then(() => {
+                            res.send("downloaded");
+                          })
+                            // added-sjf
+                            .catch(err => {
+                              console.log(67)
+                              res.status(500).send(err)
+                            })
+                        } else {
+                          //if song can not be downloaded, respond with custom message
+                          duplicateLrcErrorMessage.errorMessage = 'song is not available for karaoke yet'
+                          res.send(duplicateLrcErrorMessage)
+                        }
+                      });
+                    });
+                  }, (err) => {
+                    console.log('Error: ' + err);
+                  });
+                } catch (e) {
+                  console.log(e.code);
+                  console.log(e.msg);
+                }
+              });
             } else {
               res.send(duplicateLrcErrorMessage);
             }
