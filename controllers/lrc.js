@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // Parsing lrc reference
-const lrcParser = async (filePath) => {
+const lrcParser = (filePath) => {
   fs.readFile(filePath, async (err, data) => {
     let lyrics = await LRC.parse(data.toString());
     return JSON.stringify(lyrics);
