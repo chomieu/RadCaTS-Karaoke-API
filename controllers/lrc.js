@@ -2,6 +2,7 @@ const LRC = require("lrc.js");
 const fs = require("fs");
 const path = require("path");
 
+// Parsing lrc reference
 const lrcParser = async (filePath) => {
   fs.readFile(filePath, async (err, data) => {
     let lyrics = await LRC.parse(data.toString());
