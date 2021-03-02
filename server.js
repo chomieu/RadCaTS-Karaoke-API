@@ -36,10 +36,6 @@ app.use(sessionRoutes);
 const songRoutes = require("./controllers/song");
 app.use(songRoutes);
 
-// HTML Routes
-const htmlRoutes = require("./controllers/html");
-app.use(htmlRoutes);
-
 // Mp3 Routes
 const mp3Routes = require("./controllers/mp3");
 app.use(mp3Routes);
