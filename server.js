@@ -28,6 +28,14 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/karaoke", {
 const userRoutes = require("./controllers/user");
 app.use(userRoutes);
 
+// Session Routes
+const sessionRoutes = require("./controllers/session");
+app.use(sessionRoutes);
+
+// Song Routes
+const songRoutes = require("./controllers/song");
+app.use(songRoutes);
+
 // HTML Routes
 const htmlRoutes = require("./controllers/html");
 app.use(htmlRoutes);
@@ -36,9 +44,6 @@ app.use(htmlRoutes);
 const mp3Routes = require("./controllers/mp3");
 app.use(mp3Routes);
 
-// Session Routes
-const sessionRoutes = require("./controllers/session");
-app.use(sessionRoutes);
 
 // Server
 const PORT = process.env.PORT || 8080;
