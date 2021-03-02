@@ -62,7 +62,7 @@ router.post("/api/login", (req, res) => {
           }
         );
         console.log(token)
-        return res.json({ user: user.id, token: token });
+        return res.json({ user: user, token: token });
       } else {
         res.json({ err: "You have entered an invalid username or password!" });
       }
