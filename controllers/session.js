@@ -1,9 +1,9 @@
 const router = require("express").Router();
 const db = require("../models");
 const LRC = require("lrc.js");
-const { lrcParser } = require("./lrc.js");
 const fs = require("fs");
 const path = require("path");
+const jwt_decode = require('jwt-decode');
 
 // Deletes all stored sessions
 router.delete("/api/session/deleteAll", (req, res) => {
@@ -55,28 +55,21 @@ router.get("/api/session/:id", (req, res) => {
 //    token: "token",
 //    score: number
 // }
-// router.put("/api/session/:id", (req, res) => {
-//   // 1. Finds user via token and add the karaoke session to their records
-//   const id = decryptToken(req.body.token)
-//   db.User.findOneAndUpdate({ _id: id }, { $addToSet: { records: [req.params.id] } })
-//     .then(() => {
-//       res.send("Session added to user's records!")
-//     })
-//   // 2. Updates Session.members with the user's id and Session.scores with the user's score
-//   db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [id], scores: [{ id: req.body.score }] } })
-//     .then(() => {
-//       res.send("New member added!")
-//     })
-//     .catch(err => {
-//       if (err) throw err
-//     })
-// })
-
-// // Decrypt the token to find the right user's id
-// function decryptToken(token) {
-//   const userId
-//   // Decrypt here
-//   return userId
-// }
+router.put("/api/session/:id", (req, res) => {
+  // 1. Finds user via token and add the karaoke session to their records
+  const user = jwt_decode(req.body.token)
+  db.User.findOneAndUpdate({ _id: user.id }, { $addToSet: { records: [req.params.id] } })
+    .then(() => {
+      res.send("Session added to user's records!")
+    })
+  // 2. Updates Session.members with the user's id and Session.scores with the user's score
+  db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [id], scores: [{ id: req.body.score }] } })
+    .then(() => {
+      res.send("New member added!")
+    })
+    .catch(err => {
+      if (err) throw err
+    })
+})
 
 module.exports = router;
