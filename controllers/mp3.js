@@ -6,7 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const YoutubeMusicApi = require("youtube-music-api");
 const musicApi = new YoutubeMusicApi();
-const youtubedl = require('youtube-dl');
+const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg');
 
 // Deletes all stored songs
@@ -26,6 +26,10 @@ router.post("/api/download", (req, res) => {
       } else {
         musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
 
+          // bug: user search "let it go original"
+          // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
+          // the '/' causes an issue for createLrc() filepath
+          // split on the unwanted characters and join with single space to remove unwanted characters
           const songName = songResult.content[0].name.toLowerCase();
           const safeName = songName.split('/').join(' ');
           const artistName = songResult.content[0].artist.name.toLowerCase();
@@ -34,31 +38,18 @@ router.post("/api/download", (req, res) => {
           fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
 
             const duplicateLrcErrorMessage = {
-              title: songName,
+              title: safeName,
               artist: artistName,
               errorMessage: 'this song already existed!'
             }
 
-            if (data.indexOf(`${songName} - ${artistName}.lrc`) === -1) {
-
-              // bug: user search "let it go original"
-              // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
-              // the '/' causes an issue for createLrc() filepath
-              // split on the unwanted characters and join with single space to remove unwanted characters
-
-              duplicateLrcErrorMessage.title = safeName;
+            if (data.indexOf(`${safeName} - ${artistName}.lrc`) === -1) {
 
               createLrc(safeName, artistName);
 
-              //get mp4
-              const video = youtubedl(`http://www.youtube.com/watch?v=${songResult.content[0].videoId}`,
-                // Optional arguments passed to youtube-dl.
-                ['--format=18'],
-              )
-
-              // write mp4
+              //get and write mp4
               const mp4FilePath = path.join(__dirname, `../music/mp4/test.mp4`);
-              const mp4 = video.pipe(fs.createWriteStream(mp4FilePath));
+              const mp4 = ytdl(`http://www.youtube.com/watch?v=${songResult.content[0].videoId}`).pipe(fs.createWriteStream(mp4FilePath))
 
               mp4.on('close', () => {
                 try {
@@ -101,7 +92,7 @@ router.post("/api/download", (req, res) => {
                   });
                 } catch (e) {
                   console.log(e.code);
-                  // console.log(e.msg);
+                  console.log(e.msg);
                 }
               });
             } else {
