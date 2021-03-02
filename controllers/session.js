@@ -63,7 +63,7 @@ router.put("/api/session/:id", (req, res) => {
       res.send("Session added to user's records!")
     })
   // 2. Updates Session.members with the user's id and Session.scores with the user's score
-  db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [id], scores: [{ id: req.body.score }] } })
+  db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [user.id], scores: [{ [user.id]: req.body.score }] } })
     .then(() => {
       res.send("New member added!")
     })
