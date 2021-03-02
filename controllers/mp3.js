@@ -29,7 +29,7 @@ router.post("/api/download", (req, res) => {
           const artistName = songResult.content[0].artist.name.toLowerCase();
           const fileName = safeName + " - " + artistName;
 
-          fs.readdir(path.join(__dirname, "../lrc"), (data) => {
+          fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
             const duplicateLrcErrorMessage = {
               title: songName,
               artist: artistName,
