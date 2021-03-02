@@ -13,7 +13,7 @@ const lrcParser = (filePath) => {
 const createLrc = (songName, artistName) => {
   const fileName = `${songName} - ${artistName}.lrc`;
   const lrcPath = path.join(__dirname, `../lrc/${fileName}`);
-  const input = `[ti:${songName}][ar:${artistName}]`;
+  const input = `[ti:${songName}]\n[ar:${artistName}]`;
   fs.writeFile(lrcPath, input, (err) => console.log(err));
 };
 

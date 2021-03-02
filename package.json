@@ -31,7 +31,7 @@
     "lrc.js": "^1.0.2",
     "mongoose": "^5.11.17",
     "morgan": "^1.10.0",
-    "youtube-dl": "^3.5.0",
-    "youtube-music-api": "^1.0.6"
+    "youtube-music-api": "^1.0.6",
+    "ytdl-core": "^4.5.0"
   }
 }
