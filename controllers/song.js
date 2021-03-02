@@ -14,4 +14,11 @@ router.get("/api/song", (req, res) => {
     });
 });
 
+// Deletes all stored songs
+router.delete("/api/song/deleteAll", (req, res) => {
+  db.Song.remove().then(() => {
+    res.send("All songs deleted!")
+  })
+})
+
 module.exports = router;

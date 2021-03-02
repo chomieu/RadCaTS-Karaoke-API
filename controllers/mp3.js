@@ -1,6 +1,5 @@
 const router = require("express").Router();
 const db = require("../models");
-const { createLrc } = require("./lrc.js");
 const cloudinary = require("./cloudinary");
 const fs = require("fs");
 const path = require("path");
@@ -8,13 +7,6 @@ const YoutubeMusicApi = require("youtube-music-api");
 const musicApi = new YoutubeMusicApi();
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg');
-
-// Deletes all stored songs
-router.delete("/api/song/deleteAll", (req, res) => {
-  db.Song.remove().then(() => {
-    res.send("All songs deleted!")
-  })
-})
 
 //Download song
 router.post("/api/download", (req, res) => {
@@ -25,86 +17,68 @@ router.post("/api/download", (req, res) => {
         res.json({ err: "Please enter a valid input." });
       } else {
         musicApi.search(`${req.body.name} original song`, "song").then((songResult) => {
-
-          // bug: user search "let it go original"
-          // musicApi response for song name  - 'Let It Go (From "Frozen"/Soundtrack Version)'
-          // the '/' causes an issue for createLrc() filepath
-          // split on the unwanted characters and join with single space to remove unwanted characters
           const songName = songResult.content[0].name.toLowerCase();
           const safeName = songName.split('/').join(' ');
           const artistName = songResult.content[0].artist.name.toLowerCase();
-          const fileName = safeName + " - " + artistName;
 
-          fs.readdir(path.join(__dirname, "../lrc"), (err, data) => {
+          db.Song.findOne({ name: safeName, artist: artistName })
+            .then(oneSong => {
+              if (oneSong) {
+                res.send("This song already existed!")
+              } else {
+                //get and write mp4
+                const mp4FilePath = path.join(__dirname, `../music/mp4/test.mp4`);
+                const mp4 = ytdl(`http://www.youtube.com/watch?v=${songResult.content[0].videoId}`).pipe(fs.createWriteStream(mp4FilePath))
 
-            const duplicateLrcErrorMessage = {
-              title: safeName,
-              artist: artistName,
-              errorMessage: 'this song already existed!'
-            }
-
-            if (data.indexOf(`${safeName} - ${artistName}.lrc`) === -1) {
-
-              createLrc(safeName, artistName);
-
-              //get and write mp4
-              const mp4FilePath = path.join(__dirname, `../music/mp4/test.mp4`);
-              const mp4 = ytdl(`http://www.youtube.com/watch?v=${songResult.content[0].videoId}`).pipe(fs.createWriteStream(mp4FilePath))
-
-              mp4.on('close', () => {
-                try {
-                  const process = new ffmpeg(path.join(__dirname, `../music/mp4/test.mp4`));
-                  process.then((video) => {
-
-                    //extract mp3 from mp4
-                    video.fnExtractSoundToMP3(path.join(__dirname, `../music/mp3/test.mp3`), (error, file) => {
-                      cloudinary.uploader.upload(file, {
-                        resource_type: "video",
-                        public_id: fileName,
-                        folder: 'mp3',
-                        use_filename: true,
-                        chunk_size: 6000000,
-                      }, (error, result) => {
-                        const mp3Url = result.url;
-                        if (mp3Url) {
-                          db.Song.create({
-                            name: songName,
-                            artist: artistName,
-                            // added-sjf updated to match lrc file name 
-                            lyrics: `${safeName} - ${artistName}.lrc`,
-                            mixed: mp3Url,
-                          }).then(() => {
-                            res.send("downloaded");
-                          })
-                            // added-sjf
-                            .catch(err => {
+                mp4.on('close', () => {
+                  try {
+                    const process = new ffmpeg(path.join(__dirname, `../music/mp4/test.mp4`));
+                    process.then((video) => {
+                      //extract mp3 from mp4
+                      video.fnExtractSoundToMP3(path.join(__dirname, `../music/mp3/test.mp3`), (error, file) => {
+                        cloudinary.uploader.upload(file, {
+                          resource_type: "video",
+                          public_id: `${safeName} - ${artistName}`,
+                          folder: 'mp3',
+                          use_filename: true,
+                          chunk_size: 6000000,
+                        }, (error, result) => {
+                          const mp3Url = result.url;
+                          if (mp3Url) {
+                            db.Song.create({
+                              name: songName,
+                              artist: artistName,
+                              mixed: mp3Url,
+                            }).then(() => {
+                              res.send("downloaded");
+                            }).catch(err => {
                               res.status(500).send(err)
                             })
-                        } else {
-                          //if song can not be downloaded, respond with custom message
-                          duplicateLrcErrorMessage.errorMessage = 'song is not available for karaoke yet'
-                          res.send(duplicateLrcErrorMessage)
-                        }
+                          } else {
+                            res.send("The mp3 for this song is unavailable.")
+                          }
+                        });
                       });
+                    }, (err) => {
+                      console.log('Error-ffmpeg: ' + err);
+                      res.send("Error-ffmpeg", err);
                     });
-                  }, (err) => {
-                    console.log('Error: ' + err);
-                  });
-                } catch (e) {
-                  console.log(e.code);
-                  console.log(e.msg);
-                }
-              });
-            } else {
-              res.send(duplicateLrcErrorMessage);
-            }
-          });
+                  } catch (err) {
+                    console.log("Error-mp4", err);
+                    res.send("Error-mp4", err);
+                  }
+                });
+              }
+            }).catch(err => {
+              console.log("Error-Onesong", err);
+              res.send("Error-Onesong", err);
+            })
         });
       }
     })
-    // added-sjf
     .catch(err => {
-      res.status(500).send(err)
+      console.log("Error-Search", err);
+      res.send("Error-Search", err);
     })
 });
 
