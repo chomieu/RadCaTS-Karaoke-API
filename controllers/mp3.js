@@ -57,14 +57,14 @@ router.post("/api/download", (req, res) => {
                 process.then((video) => {
 
                   //extract mp3 from mp4
-                  video.fnExtractSoundToMP3(path.join(__dirname, `../music/mp3/test.mp3`), (file) => {
+                  video.fnExtractSoundToMP3(path.join(__dirname, `../music/mp3/test.mp3`), (error, file) => {
                     cloudinary.uploader.upload(file, {
                       resource_type: "video",
                       public_id: fileName,
                       folder: 'mp3',
                       use_filename: true,
                       chunk_size: 6000000,
-                    }, (result) => {
+                    }, (error, result) => {
                       const mp3Url = result.url;
                       if (mp3Url) {
                         db.Song.create({
@@ -74,10 +74,14 @@ router.post("/api/download", (req, res) => {
                           mixed: mp3Url,
                         }).then(() => {
                           res.send("downloaded");
+                        }).catch(err => {
+                          res.status(500).send(err)
                         })
                       }
                     });
-                  });
+                  }), (err) => {
+                    console.log('Error: ' + err);
+                  }
                 });
               } catch (err) {
                 console.log(err);
