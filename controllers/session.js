@@ -1,8 +1,5 @@
 const router = require("express").Router();
 const db = require("../models");
-const LRC = require("lrc.js");
-const fs = require("fs");
-const path = require("path");
 const jwt_decode = require('jwt-decode');
 
 // Deletes all stored sessions
@@ -17,6 +14,7 @@ router.delete("/api/session/deleteAll", (req, res) => {
 // {
 //    host: user_id,
 //    karaokeSong: song_id (comes from the search through /api/song route)
+//    karaokeLyrics: lyrics_id
 // }
 // Returns the new session's id
 router.post("/api/session", (req, res) => {
@@ -30,7 +28,7 @@ router.post("/api/session", (req, res) => {
 })
 
 // Finds created session by id
-// Returns all of karaoke song's data and files
+// Returns all of karaoke song's data and lyrics
 router.get("/api/session/:id", (req, res) => {
   db.Session.findOne({ _id: req.params.id }).populate("karaokeSong").populate("karaokeLyrics")
     .then(sessionData => {
@@ -58,6 +56,16 @@ router.put("/api/session/:id", (req, res) => {
   db.Session.findOneAndUpdate({ _id: req.params.id }, { $addToSet: { members: [user.id], scores: [{ [user.id]: req.body.score }] } })
     .then(() => {
       res.send("New member added!")
+    })
+    .catch(err => {
+      if (err) throw err
+    })
+})
+
+router.put("/api/session/lyrics/:sessionId", (req, res) => {
+  db.Session.findOneAndUpdate({ _id: req.params.sessionId }, { karaokeLyrics: req.body.lyricsId })
+    .then(() => {
+      res.send("Lyrics added to session!")
     })
     .catch(err => {
       if (err) throw err
