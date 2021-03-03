@@ -1,4 +1,4 @@
-# RadCaTS Karaoke
+# RadCaTS Karaoke API
 
 ## Table of Contents
 1. [Description](#description)
