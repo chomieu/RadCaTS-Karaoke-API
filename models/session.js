@@ -14,6 +14,10 @@ const SessionSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Song"
   },
+  karaokeLyrics: {
+    type: Schema.Types.ObjectId,
+    ref: "Lyrics"
+  },
   scores: {
     type: Array,
     default: []

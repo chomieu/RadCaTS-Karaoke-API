@@ -32,17 +32,9 @@ router.post("/api/session", (req, res) => {
 // Finds created session by id
 // Returns all of karaoke song's data and files
 router.get("/api/session/:id", (req, res) => {
-  db.Session.findOne({ _id: req.params.id }).populate("karaokeSong")
+  db.Session.findOne({ _id: req.params.id }).populate("karaokeSong").populate("karaokeLyrics")
     .then(sessionData => {
-      db.Song.findOne({ _id: sessionData.karaokeSong._id }).then(songData => {
-        fs.readFile(path.join(__dirname, `../lrc/${songData.lyrics}`), async (err, data) => {
-          let parsed = await LRC.parse(data.toString());
-          const lyrics = JSON.stringify(parsed)
-          console.log("songData", songData)
-          songData.lyrics = lyrics
-          res.json(songData)
-        });
-      })
+      res.json(sessionData)
     })
     .catch(err => {
       if (err) throw err
