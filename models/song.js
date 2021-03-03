@@ -10,10 +10,6 @@ const SongSchema = new Schema({
     type: String,
     required: true
   },
-  lyrics: {
-    type: String,
-    required: true
-  },
   mixed: {
     type: String,
     required: true

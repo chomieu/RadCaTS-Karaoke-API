@@ -40,7 +40,7 @@ router.post("/api/signup", (req, res) => {
           expiresIn: "2h",
         }
       );
-      return res.json({ user: newUser, token });
+      return res.json({ user: newUser, token: token });
     })
     .catch((err) => {
       res.status(500).json(err);
@@ -61,7 +61,8 @@ router.post("/api/login", (req, res) => {
             expiresIn: "2h",
           }
         );
-        return res.json({ user, token });
+        console.log(token)
+        return res.json({ user: user, token: token });
       } else {
         res.json({ err: "You have entered an invalid username or password!" });
       }

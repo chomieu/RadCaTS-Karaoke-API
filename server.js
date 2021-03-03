@@ -7,6 +7,13 @@ const cors = require("cors");
 app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(function (req, res, next) {	
+  res.header("Access-Control-Allow-Origin", '*');	
+  res.header("Access-Control-Allow-Credentials", true);	
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');	
+  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');	
+  next();	
+});
 app.use(cors());
 
 // Database
@@ -21,17 +28,18 @@ mongoose.connect(process.env.MONGODB_URI || "mongodb://localhost/karaoke", {
 const userRoutes = require("./controllers/user");
 app.use(userRoutes);
 
-// HTML Routes
-const htmlRoutes = require("./controllers/html");
-app.use(htmlRoutes);
+// Session Routes
+const sessionRoutes = require("./controllers/session");
+app.use(sessionRoutes);
+
+// Song Routes
+const songRoutes = require("./controllers/song");
+app.use(songRoutes);
 
 // Mp3 Routes
 const mp3Routes = require("./controllers/mp3");
 app.use(mp3Routes);
 
-// Session Routes
-const sessionRoutes = require("./controllers/session");
-app.use(sessionRoutes);
 
 // Server
 const PORT = process.env.PORT || 8080;
