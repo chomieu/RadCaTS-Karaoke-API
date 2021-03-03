@@ -3,12 +3,12 @@
 ## Table of Contents
 1. [Description](#description)
 2. [Authors](#authors)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [Contributing](#contributing)
-5. [Tests](#tests)
-6. [Questions](#questions)
-7. [License](#license)
+3. [Technologies](#technologies)
+4. [Installation](#installation)
+5. [Usage](#usage)
+6. [Contributing](#contributing)
+7. [Tests](#tests)
+8. [License](#license)
 ## Description
 A full-featured social karaoke app that dynamically loads content using the YouTube Music API, allows for custom lyric file generation, provides a hub for group sessions, and incorporates 3D elements. Built for the University of Washington's Winter 2020/21 Coding Bootcamp.
 
@@ -24,6 +24,21 @@ A full-featured social karaoke app that dynamically loads content using the YouT
 
 ## Technologies
 ![javascript](https://img.shields.io/badge/javascript-100%25-yellow)
+
+### Notable Dependencies
+- Axios: For querying other APIs.
+- BCrypt: Encryption and decryption algorithms.
+- Cloudinary: Provides cloud storage functionality for audio files.
+- CORS: Enable CORS between this and other APIs.
+- dotenv: Support for environment variables to hide API keys and other sensitive data.
+- Express: Framework for this web application's server environment.
+- FFMPEG: Allows MPEG conversion and streaming.
+- JSON Web Token: Enables decoding and transmission of JSON web tokens.
+- LRC.js: Parser for LRC files.
+- Mongoose: Object modeling for the MongoDB database.
+- Morgan: Middleware to log HTTP requests.
+- YouTube Music API: Permits us to pull audio from YouTube videos.
+- YTDL Core: YouTube downloading module.
 
 ## Installation
 Clone from git into your chosen directory and install dependencies with npm i. Frontend and backend are located in separate repositories and should be installed on separate servers. The backend requires a local MongoDB installation. Both can be run with npm start.
