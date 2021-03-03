@@ -32,8 +32,7 @@ router.post("/api/session", (req, res) => {
 router.get("/api/session/:id", (req, res) => {
   db.Session.findOne({ _id: req.params.id }).populate("karaokeSong").populate("karaokeLyrics")
     .then(sessionData => {
-      console.log(sessionData)
-      res.json(sessionData);
+      res.json(sessionData)
     })
     .catch(err => {
       if (err) throw err
