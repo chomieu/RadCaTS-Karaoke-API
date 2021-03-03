@@ -49,8 +49,9 @@ router.post("/api/download", (req, res) => {
                               name: songName,
                               artist: artistName,
                               mixed: mp3Url,
-                            }).then(() => {
-                              res.send("downloaded");
+                            }).then((newSong) => {
+                              console.log("Downloaded: ", newSong.id)
+                              res.send(newSong.id);
                             }).catch(err => {
                               res.status(500).send(err)
                             })
