@@ -15,6 +15,17 @@ router.get("/api/lyrics/:songId", (req, res) => {
         })
 })
 
+router.get("/api/lyric/:id", (req, res) => {
+    db.Lyrics.find({ _id: req.params.id })
+        .then(lyrics => {
+            console.log(lyrics)
+            res.json(lyrics)
+        })
+        .catch(err => {
+            console.log(err)
+        })
+})
+
 //post route
 router.post("/api/lyrics", (req, res) => {
     const { creator, associatedSong, lyrics } = req.body;
