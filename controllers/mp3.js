@@ -43,12 +43,11 @@ router.post("/api/download", (req, res) => {
                           use_filename: true,
                           chunk_size: 6000000,
                         }, (error, result) => {
-                          const mp3Url = result.url;
-                          if (mp3Url) {
+                          if (result) {
                             db.Song.create({
                               name: songName,
                               artist: artistName,
-                              mixed: mp3Url,
+                              mixed: result.url,
                             }).then((newSong) => {
                               console.log("Downloaded: ", newSong.id)
                               res.send(newSong.id);
