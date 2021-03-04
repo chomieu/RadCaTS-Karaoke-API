@@ -7,13 +7,13 @@ const LyricsSchema = new Schema({
     ref: "User",
     required: true
   },
-  assiciatedSong: {
+  associatedSong: {
     type: Schema.Types.ObjectId,
     ref: "Song",
     required: true
   },
   lyrics: {
-    type: Array,
+    type: Object,
     required: true
   }
 });

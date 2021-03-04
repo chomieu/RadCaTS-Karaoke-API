@@ -6,7 +6,6 @@ const db = require("../models");
 router.get("/api/song", (req, res) => {
   db.Song.find({}).sort([['name', 1]])
     .then(data => {
-      console.log(data)
       res.json(data)
     })
     .catch((err) => {
