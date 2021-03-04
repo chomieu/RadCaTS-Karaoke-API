@@ -19,7 +19,6 @@
   },
   "homepage": "https://github.com/chomieu/RadCaTS-Karaoke-Backend#readme",
   "dependencies": {
-    "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "cloudinary": "^1.25.0",
     "cors": "^2.8.5",

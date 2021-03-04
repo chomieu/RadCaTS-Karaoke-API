@@ -4,10 +4,8 @@ const path = require("path");
 
 // Parsing lrc reference
 const lrcParser = (lyricsArr) => {
-  // fs.readFile(filePath, async (err, data) => {
   let lyrics = LRC.parse(lyricsArr.toString());
   return JSON.stringify(lyrics);
-  // });
 };
 
 const createLrc = (songName, artistName) => {

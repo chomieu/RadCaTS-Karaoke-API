@@ -61,16 +61,25 @@ router.post("/api/login", (req, res) => {
             expiresIn: "2h",
           }
         );
-        console.log(token)
         return res.json({ user: user, token: token });
       } else {
         res.json({ err: "You have entered an invalid username or password!" });
       }
     })
     .catch((err) => {
-      res.json(err);
+      res.status(500).json(err);
     });
 });
+
+router.put("/api/pfp/:id", (req, res) => {
+  db.User.findOneAndUpdate({ _id: req.params.id }, { profilePicture: req.body.url })
+    .then(() => {
+      res.send("profile picture updated")
+    })
+    .catch(err => {
+      res.status(500).json(err);
+    })
+})
 
 // Autenticate user login information and populates homepage with user data
 router.get("/", (req, res) => {

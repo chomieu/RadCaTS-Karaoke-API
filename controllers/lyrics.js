@@ -1,13 +1,11 @@
 const router = require("express").Router();
 const db = require("../models");
 const { lrcParser } = require("../controllers/lrc");
-const mongoose = require('mongoose');
 
 // return all lyrics related to specific song
 router.get("/api/lyrics/:songId", (req, res) => {
     db.Lyrics.find({ associatedSong: req.params.songId }).populate("associatedSong").populate("creator")
         .then(lyrics => {
-            console.log(lyrics)
             res.json(lyrics)
         })
         .catch(err => {
@@ -18,7 +16,6 @@ router.get("/api/lyrics/:songId", (req, res) => {
 router.get("/api/lyric/:id", (req, res) => {
     db.Lyrics.find({ _id: req.params.id })
         .then(lyrics => {
-            console.log(lyrics)
             res.json(lyrics)
         })
         .catch(err => {
@@ -32,7 +29,6 @@ router.post("/api/lyrics", (req, res) => {
     const lyricsJSON = lrcParser(lyrics);
     db.Lyrics.create({ creator, associatedSong, lyrics: JSON.parse(lyricsJSON) })
         .then(lyricsData => {
-            console.log(lyricsData);
             res.json(lyricsData)
         })
         .catch(err => {
@@ -46,7 +42,6 @@ router.put("/api/lyrics", (req, res) => {
     const lyricsJSON = lrcParser(lyrics);
     db.Lyrics.findOneAndUpdate({ creator, associatedSong }, { lyrics: JSON.parse(lyricsJSON) })
         .then(lyricsData => {
-            console.log(lyricsData);
             res.json(lyricsData)
         })
         .catch(err => {
