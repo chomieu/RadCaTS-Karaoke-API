@@ -1,4 +1,4 @@
-# RadCaTS Karaoke API
+# RadCaTS Karaoke
 
 ## Table of Contents
 1. [Description](#description)
@@ -6,9 +6,10 @@
 3. [Technologies](#technologies)
 4. [Installation](#installation)
 5. [Usage](#usage)
-6. [Contributing](#contributing)
-7. [Tests](#tests)
-8. [License](#license)
+6. [Deployed](#deployed)
+7. [Contributing](#contributing)
+8. [Tests](#tests)
+9. [License](#license)
 ## Description
 A full-featured social karaoke app that dynamically loads content using the YouTube Music API, allows for custom lyric file generation, provides a hub for group sessions, and incorporates 3D elements. Built for the University of Washington's Winter 2020/21 Coding Bootcamp.
 
@@ -26,7 +27,6 @@ A full-featured social karaoke app that dynamically loads content using the YouT
 ![javascript](https://img.shields.io/badge/javascript-100%25-yellow)
 
 ### Notable Dependencies
-- Axios: For querying other APIs.
 - BCrypt: Encryption and decryption algorithms.
 - Cloudinary: Provides cloud storage functionality for audio files.
 - CORS: Enable CORS between this and other APIs.
@@ -41,12 +41,39 @@ A full-featured social karaoke app that dynamically loads content using the YouT
 - YTDL Core: YouTube downloading module.
 
 ## Installation
-Clone from git into your chosen directory and install dependencies with npm i. Frontend and backend are located in separate repositories and should be installed on separate servers. The backend requires a local MongoDB installation. Both can be run with npm start.
-[Frontend Repository](https://github.com/chomieu/RadCaTS-Karaoke)
-[Backend Repository](https://github.com/chomieu/RadCaTS-Karaoke-API)
+This is the backend repository. Clone from git into your chosen directory and install dependencies with npm i. Frontend, backend, and session server are located in separate repositories and should be run on separate servers. The backend requires a local MongoDB installation. All can be run with npm start.
+- [Frontend Repository](https://github.com/chomieu/RadCaTS-Karaoke) 
+- [Backend Repository](https://github.com/chomieu/RadCaTS-Karaoke-API)
+- [Server Repository](https://github.com/chomieu/RadCaTS-Karaoke-Server)
 
 ## Usage
-The landing page will prompt the user to create or sign in with login credentials. Next you will be prompted to find a song. This page searches our Cloudinary storage for matches to the user input, then loads it or attempts to download it if not there. Next, you will be prompted to generate a lyrics file if one is not present using our lyrics file generator. Finally, the user moves to the actual session where the play button controls music playback and lyrics are displayed onscreen. Other users can join this session by entering the session URL, and the site provides functionality to share URLs with other users through email.
+
+The landing page will prompt the user to create or sign in with login credentials. 
+
+![screenshot1](./assets/screen1.png)
+
+Next you will be prompted to find a song. This page searches our Cloudinary storage for matches to the user input, then loads it or attempts to download it if not there. 
+
+![screenshot2](./assets/screen2.png)
+
+Next you will be prompted to choose a lyrics file...
+
+![screenshot3](./assets/screen3.png)
+
+...or generate one if there is none present.
+
+![screenshot4](./assets/screen4.png)
+
+Finally, the user moves to the actual session where the play button controls music playback and lyrics are displayed onscreen.
+
+![screenshot5](./assets/screen5.png)
+
+Other users can join this session by entering the session URL, and the site provides functionality to share URLs with other users through email.
+
+## Deployed
+- [Frontend (user) site](https://radcats-karaoke.herokuapp.com) 
+- [Backend API routes](https://radcats-karaoke-api.herokuapp.com)
+- [Socket.io server](http://radcats-karaoke-server.herokuapp.com/)
 
 ## Contributing
 Fork our git, and contact the repository owner about pull requests.
