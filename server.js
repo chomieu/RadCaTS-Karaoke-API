@@ -8,7 +8,7 @@ app.use(logger("dev"));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors({
-  origin: ["https://radcats-karaoke.herokuapp.com/"],
+  // origin: ["https://radcats-karaoke.herokuapp.com/"],
 }));
 
 // Database
