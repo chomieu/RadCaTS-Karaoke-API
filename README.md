@@ -11,7 +11,7 @@
 8. [Tests](#tests)
 9. [License](#license)
 ## Description
-A full-featured social karaoke app that dynamically loads content using the YouTube Music API, allows for custom lyric file generation, provides a hub for group sessions, and incorporates 3D elements. Built for the University of Washington's Winter 2020/21 Coding Bootcamp.
+A full-featured social karaoke app that dynamically loads content using the YouTube Music API, allows for custom lyric file generation, provides a hub for group sessions, and incorporates 3D elements. Winner of the Best Functionality award for the University of Washington's Winter 2020/21 Coding Bootcamp.
 
 ## Authors
 
