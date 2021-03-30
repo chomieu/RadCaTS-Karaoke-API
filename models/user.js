@@ -15,7 +15,7 @@ const UserSchema = new Schema({
   },
   profilePicture: {
     type: String,
-    default: "https://i.imgur.com/owu9ukE.jpeg",
+    default: "https://res.cloudinary.com/drdwcvbe8/image/upload/v1617147669/mp3/download_sndb3m.jpg",
   },
   records: [
     {
