@@ -20,4 +20,34 @@ router.delete("/api/song/deleteAll", (req, res) => {
   })
 })
 
+router.post("/api/song", (req, res) => {
+  db.Song.create(req.body)
+    .then(() => {
+      res.send("song added")
+    })
+    .catch(err => {
+      if (err) throw err;
+    })
+})
+
+router.put("/api/song/:id", (req, res) => {
+  db.Song.updateOne({ _id: req.params.id }, { name: req.body.name, artist: req.body.artist })
+    .then((data) => {
+      res.json(data)
+    })
+    .catch(err => {
+      if (err) throw err;
+    })
+})
+
+router.delete("/api/song/:id", (req, res) => {
+  db.Song.remove({ _id: req.params.id })
+    .then((data) => {
+      res.json(data)
+    })
+    .catch(err => {
+      if (err) throw err;
+    })
+})
+
 module.exports = router;
